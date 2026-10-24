@@ -4,6 +4,10 @@ on:
   workflow_dispatch:
   workflow_call:
 
+env:
+  # Override this value to use a custom Manager package in all builds.
+  KSU_PACKAGE_NAME: &ksu_package_name gm.sanno.xd
+
 jobs:
   generate-key:
     if: github.ref == 'refs/heads/main'
@@ -66,6 +70,7 @@ jobs:
     needs: generate-key
     uses: ./.github/workflows/build-lkm.yml
     with:
+      package_name: *ksu_package_name
       expected_size: ${{ needs.generate-key.outputs.expected_size || '' }}
       expected_hash: ${{ needs.generate-key.outputs.expected_hash || '' }}
     secrets: inherit
@@ -85,6 +90,7 @@ jobs:
           - target: riscv64-linux-android
     uses: ./.github/workflows/ksud.yml
     with:
+      package_name: *ksu_package_name
       target: ${{ matrix.target }}
       pack_lkm: true
       pack_ksuinit: true
@@ -107,6 +113,7 @@ jobs:
             os: ubuntu-latest
     uses: ./.github/workflows/ksud-extra.yml
     with:
+      package_name: *ksu_package_name
       target: ${{ matrix.target }}
       os: ${{ matrix.os }}
       pack_lkm: true
@@ -166,9 +173,9 @@ jobs:
       - name: Build with Gradle
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            ./gradlew clean assembleRelease -PIS_PR_BUILD=true
+            ./gradlew clean assembleRelease -PIS_PR_BUILD=true -PKSU_PACKAGE_NAME="$KSU_PACKAGE_NAME"
           else
-            ./gradlew clean assembleRelease
+            ./gradlew clean assembleRelease -PKSU_PACKAGE_NAME="$KSU_PACKAGE_NAME"
           fi
 
       - name: Upload build artifact
