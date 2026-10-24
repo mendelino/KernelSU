@@ -2,6 +2,11 @@ name: Build ksud with cross
 on:
   workflow_call:
     inputs:
+      package_name:
+        description: 'package name of manager'
+        required: false
+        default: ''
+        type: string
       target:
         required: true
         type: string
@@ -64,6 +69,9 @@ jobs:
           userspace/ksud/src/lkm_image_bootstrap.S
 
     - name: Build ksud
+      env:
+        CROSS_BUILD_ENV_PASSTHROUGH: KSU_PACKAGE_NAME
+        KSU_PACKAGE_NAME: ${{ inputs.package_name || 'me.weishu.kernelsu' }}
       run: CROSS_NO_WARNINGS=0 cross build --target ${{ inputs.target }} --release --manifest-path ./userspace/ksud/Cargo.toml
 
     - name: Upload ksud artifact
