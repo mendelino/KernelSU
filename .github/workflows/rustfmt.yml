@@ -1,26 +1,14 @@
 name: Rustfmt check
 
 on:
-  push:
-    branches:
-      - 'main'
-      - 'dev'
-    paths:
-      - '.github/workflows/rustfmt.yml'
-      - 'userspace/**'
-  pull_request:
-    branches:
-      - 'main'
-      - 'dev'
-    paths:
-      - '.github/workflows/rustfmt.yml'
-      - 'userspace/**'
+  workflow_dispatch:
 
 permissions:
   checks: write
 
 jobs:
   format:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7

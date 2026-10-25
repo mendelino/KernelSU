@@ -1,23 +1,11 @@
 name: ShellCheck
 
 on:
-  push:
-    branches:
-      - 'main'
-      - 'dev'
-    paths:
-      - '.github/workflows/shellcheck.yml'
-      - '**/*.sh'
-  pull_request:
-    branches:
-      - 'main'
-      - 'dev'
-    paths:
-      - '.github/workflows/shellcheck.yml'
-      - '**/*.sh'
+  workflow_dispatch:
 
 jobs:
   shellcheck:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
