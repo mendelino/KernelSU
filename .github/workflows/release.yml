@@ -1,18 +1,24 @@
 name: Release
 on:
-  push:
-    tags:
-      - "v*"
   workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag (e.g. v1.0.0)'
+        required: true
+        type: string
 
 jobs:
   build-manager:
+    if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/build-manager.yml
     secrets: inherit
   release:
+    if: github.ref == 'refs/heads/main'
     needs:
       - build-manager
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v8
@@ -64,6 +70,8 @@ jobs:
       - name: release
         uses: softprops/action-gh-release@v3
         with:
+          tag_name: ${{ inputs.tag_name }}
+          target_commitish: ${{ github.sha }}
           files: |
             manager/*.apk
             lkm/lkm-*_kernelsu.ko

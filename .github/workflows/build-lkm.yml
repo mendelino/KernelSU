@@ -20,6 +20,7 @@ on:
   workflow_dispatch:
 jobs:
   build-lkm:
+    if: github.ref == 'refs/heads/main'
     strategy:
       matrix:
         kmi:
